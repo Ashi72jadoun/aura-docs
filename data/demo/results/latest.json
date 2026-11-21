@@ -1,0 +1,49 @@
+{
+  "evaluation_cases": 3,
+  "top_k": 2,
+  "unit": "unique document-page pairs",
+  "precision_at_k": 0.5,
+  "recall_at_k": 1.0,
+  "mrr_at_k": 0.6666666666666666,
+  "hit_rate_at_k": 1.0,
+  "missing_page_metadata_total": 0,
+  "missing_document_metadata_total": 0,
+  "per_question": [
+    {
+      "id": "demo-en-open",
+      "language": "en",
+      "precision_at_k": 0.5,
+      "recall_at_k": 1.0,
+      "reciprocal_rank_at_k": 1.0,
+      "hit_at_k": true,
+      "relevant_page_count": 1,
+      "retrieved_unique_page_count": 2,
+      "missing_page_metadata_count": 0,
+      "missing_document_metadata_count": 0
+    },
+    {
+      "id": "demo-en-closed",
+      "language": "en",
+      "precision_at_k": 0.5,
+      "recall_at_k": 1.0,
+      "reciprocal_rank_at_k": 0.5,
+      "hit_at_k": true,
+      "relevant_page_count": 1,
+      "retrieved_unique_page_count": 2,
+      "missing_page_metadata_count": 0,
+      "missing_document_metadata_count": 0
+    },
+    {
+      "id": "demo-hi-open",
+      "language": "hi",
+      "precision_at_k": 0.5,
+      "recall_at_k": 1.0,
+      "reciprocal_rank_at_k": 0.5,
+      "hit_at_k": true,
+      "relevant_page_count": 1,
+      "retrieved_unique_page_count": 2,
+      "missing_page_metadata_count": 0,
+      "missing_document_metadata_count": 0
+    }
+  ]
+}

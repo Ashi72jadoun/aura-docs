@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --aura-text: #342a32;
+            --aura-muted: #786f78;
+            --aura-surface: #fffefd;
+            --aura-input: #fffefd;
+            --aura-border: #f1d9ce;
+            --aura-coral: #ff805d;
+            --aura-blue: #8998f3;
+            --aura-toggle-track: #efddd4;
+            --aura-focus: rgba(255, 128, 93, 0.16);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-width: 0;
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        body {
+            color: var(--aura-text);
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        #root {
+            width: 100%;
+            min-width: 0;
+            padding: 2px 1px;
+        }
+
+        /* Theme switch */
+        .theme-wrap {
+            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            align-items: center;
+            min-height: 30px;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-flex;
+            width: 46px;
+            min-width: 46px;
+            height: 26px;
+            min-height: 26px;
+            padding: 2px;
+            align-items: center;
+            border: 1px solid var(--aura-border);
+            border-radius: 999px;
+            background: var(--aura-toggle-track);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .theme-switch[data-dark="true"] {
+            border-color: transparent;
+            background: linear-gradient(
+                110deg,
+                var(--aura-coral),
+                var(--aura-blue)
+            );
+        }
+
+        .theme-knob {
+            display: flex;
+            width: 20px;
+            height: 20px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #fffefd;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+            transform: translateX(0);
+            transition: transform 150ms ease;
+        }
+
+        .theme-switch[data-dark="true"] .theme-knob {
+            transform: translateX(20px);
+        }
+
+        .theme-knob svg {
+            width: 12px;
+            height: 12px;
+            fill: none;
+            stroke: #6b5961;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        .theme-switch:focus-visible {
+            outline: 2px solid var(--aura-coral);
+            outline-offset: 3px;
+        }
+
+        /* One real browser form for the entire chat composer. */
+        .composer-form {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+            min-height: 56px;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .input-shell {
+            display: flex;
+            flex: 1 1 auto;
+            width: 0;
+            min-width: 0;
+            height: 52px;
+            align-items: center;
+            border: 1px solid var(--aura-border);
+            border-radius: 14px;
+            background: var(--aura-input);
+            transition:
+                border-color 140ms ease,
+                box-shadow 140ms ease;
+        }
+
+        .input-shell:focus-within {
+            border-color: var(--aura-coral);
+            box-shadow: 0 0 0 3px var(--aura-focus);
+        }
+
+        .question-input {
+            flex: 1 1 auto;
+            width: 0;
+            min-width: 0;
+            height: 100%;
+            margin: 0;
+            padding: 0 14px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--aura-text);
+            font: inherit;
+            font-size: 15px;
+        }
+
+        .question-input::placeholder {
+            color: var(--aura-muted);
+            opacity: 1;
+        }
+
+        .question-input:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+        .icon-button {
+            display: inline-flex;
+            flex: 0 0 38px;
+            width: 38px;
+            min-width: 38px;
+            height: 38px;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--aura-muted);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .icon-button:hover:not(:disabled) {
+            background: rgba(255, 128, 93, 0.10);
+            color: var(--aura-coral);
+        }
+
+        .icon-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .icon-button:focus-visible,
+        .send-button:focus-visible {
+            outline: 2px solid var(--aura-coral);
+            outline-offset: 2px;
+        }
+
+        .icon-button svg {
+            width: 19px;
+            height: 19px;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        .clear-button {
+            color: var(--aura-muted);
+            font-family: Arial, sans-serif;
+            font-size: 25px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .clear-button[hidden] {
+            display: none !important;
+        }
+
+        .mic-button {
+            margin-right: 7px;
+            color: var(--aura-text);
+        }
+
+        .send-button {
+            display: inline-flex;
+            flex: 0 0 128px;
+            width: 128px;
+            min-width: 100px;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            border: 0;
+            border-radius: 15px;
+            background: linear-gradient(
+                110deg,
+                var(--aura-coral),
+                var(--aura-blue)
+            );
+            color: #ffffff;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 650;
+            cursor: pointer;
+            transition:
+                filter 140ms ease,
+                opacity 140ms ease;
+        }
+
+        .send-button:hover:not(:disabled) {
+            filter: brightness(1.04);
+        }
+
+        .send-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        @media (max-width: 520px) {
+            .composer-form {
+                gap: 7px;
+            }
+
+            .send-button {
+                flex-basis: 72px;
+                width: 72px;
+                min-width: 72px;
+                padding: 0 8px;
+            }
+
+            .question-input {
+                padding-right: 7px;
+                padding-left: 10px;
+                font-size: 14px;
+            }
+
+            .mic-button {
+                margin-right: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const root = document.getElementById("root");
+            let currentMode = "";
+            let currentDarkMode = false;
+            let composerElements = null;
+            let themeButton = null;
+
+            const palettes = {
+                light: {
+                    text: "#342a32",
+                    muted: "#786f78",
+                    surface: "#fffefd",
+                    input: "#fffefd",
+                    border: "#f1d9ce",
+                    coral: "#ff805d",
+                    blue: "#8998f3",
+                    toggleTrack: "#efddd4",
+                    focus: "rgba(255, 128, 93, 0.16)"
+                },
+                dark: {
+                    text: "#f8f1f4",
+                    muted: "#c1b7c2",
+                    surface: "#282631",
+                    input: "#24232d",
+                    border: "#45414f",
+                    coral: "#ff8968",
+                    blue: "#929ff8",
+                    toggleTrack: "#504a59",
+                    focus: "rgba(255, 137, 104, 0.20)"
+                }
+            };
+
+            function setFrameHeight(height) {
+                window.parent.postMessage(
+                    {
+                        isStreamlitMessage: true,
+                        type: "streamlit:setFrameHeight",
+                        height: height
+                    },
+                    "*"
+                );
+            }
+
+            function sendValue(value) {
+                const eventValue = {
+                    ...value,
+                    event_id:
+                        Date.now().toString(36) +
+                        "-" +
+                        Math.random().toString(36).slice(2)
+                };
+
+                window.parent.postMessage(
+                    {
+                        isStreamlitMessage: true,
+                        type: "streamlit:setComponentValue",
+                        value: eventValue,
+                        dataType: "json"
+                    },
+                    "*"
+                );
+            }
+
+            function applyPalette(darkMode) {
+                const palette = darkMode ? palettes.dark : palettes.light;
+                const style = document.documentElement.style;
+
+                style.setProperty("--aura-text", palette.text);
+                style.setProperty("--aura-muted", palette.muted);
+                style.setProperty("--aura-surface", palette.surface);
+                style.setProperty("--aura-input", palette.input);
+                style.setProperty("--aura-border", palette.border);
+                style.setProperty("--aura-coral", palette.coral);
+                style.setProperty("--aura-blue", palette.blue);
+                style.setProperty("--aura-toggle-track", palette.toggleTrack);
+                style.setProperty("--aura-focus", palette.focus);
+            }
+
+            function sunIcon() {
+                return `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3.5"></circle>
+                        <path d="M12 2.5v2M12 19.5v2M4.4 4.4l1.4 1.4M18.2 18.2l1.4 1.4M2.5 12h2M19.5 12h2M4.4 19.6l1.4-1.4M18.2 5.8l1.4-1.4"></path>
+                    </svg>
+                `;
+            }
+
+            function moonIcon() {
+                return `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 15.2A8.6 8.6 0 0 1 8.8 4a8.8 8.8 0 1 0 11.2 11.2Z"></path>
+                    </svg>
+                `;
+            }
+
+            function updateThemeSwitch(darkMode) {
+                currentDarkMode = Boolean(darkMode);
+                applyPalette(currentDarkMode);
+
+                if (!themeButton) {
+                    return;
+                }
+
+                themeButton.dataset.dark = String(currentDarkMode);
+                themeButton.setAttribute(
+                    "aria-checked",
+                    String(currentDarkMode)
+                );
+                themeButton.setAttribute(
+                    "aria-label",
+                    currentDarkMode
+                        ? "Switch to light mode"
+                        : "Switch to dark mode"
+                );
+
+                const icon = themeButton.querySelector(".theme-icon");
+                if (icon) {
+                    icon.innerHTML = currentDarkMode
+                        ? moonIcon()
+                        : sunIcon();
+                }
+            }
+
+            function buildThemeControl() {
+                root.innerHTML = `
+                    <div class="theme-wrap">
+                        <button
+                            class="theme-switch"
+                            id="theme-switch"
+                            type="button"
+                            role="switch"
+                            aria-label="Switch between light and dark mode"
+                            aria-checked="false"
+                        >
+                            <span class="theme-knob">
+                                <span class="theme-icon"></span>
+                            </span>
+                        </button>
+                    </div>
+                `;
+
+                themeButton = document.getElementById("theme-switch");
+
+                themeButton.addEventListener("click", () => {
+                    const nextDarkMode = !currentDarkMode;
+                    updateThemeSwitch(nextDarkMode);
+                    sendValue({
+                        kind: "theme",
+                        dark_mode: nextDarkMode
+                    });
+                });
+            }
+
+            function buildComposer() {
+                root.innerHTML = `
+                    <form
+                        class="composer-form"
+                        id="composer-form"
+                        autocomplete="off"
+                    >
+                        <div class="input-shell">
+                            <input
+                                class="question-input"
+                                id="question-input"
+                                type="text"
+                                autocomplete="off"
+                                spellcheck="true"
+                                placeholder="Ask about your PDFs in any language…"
+                                aria-label="Your question"
+                            >
+
+                            <button
+                                class="icon-button clear-button"
+                                id="clear-button"
+                                type="button"
+                                title="Clear your question"
+                                aria-label="Clear your question"
+                                hidden
+                            >×</button>
+
+                            <button
+                                class="icon-button mic-button"
+                                id="mic-button"
+                                type="button"
+                                title="Ask by voice"
+                                aria-label="Ask by voice"
+                            >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <rect x="9" y="3" width="6" height="12" rx="3"></rect>
+                                    <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3M9 21h6"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <button
+                            class="send-button"
+                            id="send-button"
+                            type="submit"
+                        >Send</button>
+                    </form>
+                `;
+
+                const form = document.getElementById("composer-form");
+                const input = document.getElementById("question-input");
+                const clearButton = document.getElementById("clear-button");
+                const micButton = document.getElementById("mic-button");
+                const sendButton = document.getElementById("send-button");
+
+                function updateClearButton() {
+                    clearButton.hidden = input.value.length === 0;
+                }
+
+                clearButton.addEventListener("click", () => {
+                    input.value = "";
+                    updateClearButton();
+                    input.focus();
+                });
+
+                input.addEventListener("input", updateClearButton);
+
+                micButton.addEventListener("click", () => {
+                    if (!micButton.disabled) {
+                        sendValue({ kind: "voice" });
+                    }
+                });
+
+                form.addEventListener("submit", (event) => {
+                    event.preventDefault();
+
+                    const question = input.value.trim();
+                    if (!question || sendButton.disabled) {
+                        return;
+                    }
+
+                    input.value = "";
+                    updateClearButton();
+
+                    sendValue({
+                        kind: "submit",
+                        question: question
+                    });
+                });
+
+                composerElements = {
+                    input,
+                    micButton,
+                    sendButton
+                };
+            }
+
+            function updateComposer(args) {
+                if (!composerElements) {
+                    return;
+                }
+
+                const enabled = Boolean(args.enabled);
+                composerElements.input.disabled = !enabled;
+                composerElements.micButton.disabled = !enabled;
+                composerElements.sendButton.disabled = !enabled;
+
+                if (typeof args.placeholder === "string") {
+                    composerElements.input.placeholder = args.placeholder;
+                }
+            }
+
+            function render(args) {
+                const mode = args.mode === "theme" ? "theme" : "composer";
+
+                if (mode !== currentMode) {
+                    currentMode = mode;
+                    root.innerHTML = "";
+                    composerElements = null;
+                    themeButton = null;
+
+                    if (currentMode === "theme") {
+                        buildThemeControl();
+                    } else {
+                        buildComposer();
+                    }
+                }
+
+                updateThemeSwitch(Boolean(args.dark_mode));
+
+                if (currentMode === "composer") {
+                    updateComposer(args);
+                    setFrameHeight(64);
+                } else {
+                    setFrameHeight(34);
+                }
+            }
+
+            window.addEventListener("message", (event) => {
+                const message = event.data;
+
+                if (
+                    message &&
+                    message.type === "streamlit:render" &&
+                    message.args
+                ) {
+                    render(message.args);
+                }
+            });
+
+            window.parent.postMessage(
+                {
+                    isStreamlitMessage: true,
+                    type: "streamlit:componentReady",
+                    apiVersion: 1
+                },
+                "*"
+            );
+        })();
+    </script>
+</body>
+</html>

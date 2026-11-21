@@ -1,0 +1,1 @@
+"""Automated tests for the Intelligent Document QA project."""

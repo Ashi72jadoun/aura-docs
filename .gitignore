@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Private PDFs and local indexes
+data/pdfs/
+data/vector_store/
+data/evaluation/results/
+data/evaluation/gold_questions.jsonl
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
