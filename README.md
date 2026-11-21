@@ -1,122 +1,145 @@
 <div align="center">
+  <h1>📚 AURA DoCS</h1>
 
-# 📚 AURA DoCS
+  <p>
+    <img src="https://img.shields.io/badge/Python-FF805D?style=for-the-badge&amp;logo=python&amp;logoColor=white" alt="Python">
+    <img src="https://img.shields.io/badge/Streamlit-8998F3?style=for-the-badge&amp;logo=streamlit&amp;logoColor=white" alt="Streamlit">
+    <img src="https://img.shields.io/badge/SQLite-342A32?style=for-the-badge&amp;logo=sqlite&amp;logoColor=white" alt="SQLite">
+    <img src="https://img.shields.io/badge/NumPy-8998F3?style=for-the-badge&amp;logo=numpy&amp;logoColor=white" alt="NumPy">
+    <img src="https://img.shields.io/badge/PyMuPDF-FF805D?style=for-the-badge" alt="PyMuPDF">
+    <img src="https://img.shields.io/badge/Groq_API-342A32?style=for-the-badge" alt="Groq API">
+  </p>
 
-![Python](https://img.shields.io/badge/Python-FF805D?style=for-the-badge&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-8998F3?style=for-the-badge&logo=streamlit&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite-342A32?style=for-the-badge&logo=sqlite&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-8998F3?style=for-the-badge&logo=numpy&logoColor=white)
-![PyMuPDF](https://img.shields.io/badge/PyMuPDF-FF805D?style=for-the-badge)
-![RAG](https://img.shields.io/badge/Multilingual_RAG-342A32?style=for-the-badge)
+  <p><strong>Your documents, ready for a conversation.</strong></p>
 
-### Your documents, ready for a conversation.
-
-Ask questions about text-based PDFs, get document-grounded answers, and follow page references—all in a warm, multilingual chat interface.
-
+  <p>
+    Ask questions about text-based PDFs, explore answers with page references,
+    and chat in the language that feels natural.
+  </p>
 </div>
 
 ---
 
-## 🎨 AURA in two moods
+## 🌅 Dashboard gallery
 
 <table>
   <tr>
     <td align="center" width="50%">
       <strong>🌅 Peach Sunrise · Light theme</strong><br><br>
       <img
-        src="docs/assets/aura-peach-sunrise.png"
+        src="docs/assets/aura-peach-sunrise-readme.png"
+        width="480"
+        height="270"
         alt="AURA DoCS in Peach Sunrise light theme"
-        width="100%"
       >
     </td>
     <td align="center" width="50%">
       <strong>🌙 Midnight Bloom · Dark theme</strong><br><br>
       <img
-        src="docs/assets/aura-midnight-bloom.png"
+        src="docs/assets/aura-midnight-bloom-readme.png"
+        width="480"
+        height="270"
         alt="AURA DoCS in Midnight Bloom dark theme"
-        width="100%"
       >
     </td>
   </tr>
 </table>
 
-## 🪸 AURA color palette
-
-| UI accent | Color |
-|---|---|
-| Coral | `#FF805D` |
-| Soft blue | `#8998F3` |
-| Warm background | `#FFF7F1` |
-| Deep text | `#342A32` |
+Both previews use equal-size **1200 × 675** image files and are displayed at **480 × 270**.
 
 ## ✨ What is AURA DoCS?
 
-AURA DoCS is a PDF question-answering app built with **retrieval-augmented generation (RAG)**. In simple terms, it searches a PDF for relevant passages first, then uses those passages to help answer your question.
+AURA DoCS is a PDF question-answering app built around retrieval-augmented generation (RAG). In simple terms, it first searches your PDFs for relevant passages, then uses those passages to help answer your question.
 
-Answers include source and page references where available. When the retrieved text does not provide enough evidence, the app can abstain rather than present an unsupported answer.
+The app includes source and page references where available. If there isn’t enough evidence in the retrieved passages, it can abstain rather than invent an answer.
 
-## 🧭 How it works
+## 🧭 How the workflow works
 
 ```mermaid
-flowchart LR
-    PDF["PDF upload"] --> EXTRACT["PyMuPDF<br/>page-aware text extraction"]
-    EXTRACT --> CHUNK["Text chunks<br/>with page metadata"]
-    CHUNK --> DOCEMBED["Multilingual E5<br/>document embeddings · local"]
-    DOCEMBED --> STORE[("SQLite + NumPy<br/>local vector storage")]
+flowchart TD
+    PDF["Upload a text based PDF"] --> EXTRACT["Extract page text with PyMuPDF"]
+    EXTRACT --> CHUNKS["Split text and keep page information"]
+    CHUNKS --> DOCEMBED["Create document embeddings locally"]
+    DOCEMBED --> STORE["Store passages and vectors in SQLite"]
 
-    QUESTION["Typed question"] --> QUERYEMBED["Multilingual E5<br/>query embedding · local"]
-    QUERYEMBED --> SEARCH["Top-K passage retrieval"]
-    STORE --> SEARCH
+    TYPED["Type a question"] --> QUESTION["Question"]
+    MIC["Choose the microphone"] --> RECORD["Record audio in the browser"]
+    RECORD --> CONSENT["Give consent for transcription"]
+    CONSENT --> TRANSCRIBE["Transcribe the recording"]
+    TRANSCRIBE --> QUESTION
 
-    QUESTION --> CONTEXT["Question + matching passages<br/>+ relevant follow-up context"]
-    SEARCH --> CONTEXT
-    CONTEXT --> MODEL["Groq API<br/>configured Qwen model"]
-    MODEL --> ANSWER["Grounded answer<br/>with page references or abstention"]
-
-    MIC["Optional voice input"] --> RECORD["Browser recording<br/>with microphone permission"]
-    RECORD --> CONSENT["Transcription<br/>after user consent"]
-    CONSENT --> QUESTION
+    QUESTION --> QUERYEMBED["Create a query embedding locally"]
+    QUERYEMBED --> RETRIEVE["Find the best matching passages"]
+    STORE --> RETRIEVE
+    QUESTION --> CONTEXT["Build a bounded context"]
+    RETRIEVE --> CONTEXT
+    CONTEXT --> MODEL["Send the question and passages to the configured answer model"]
+    MODEL --> CHECK["Apply answer and citation reliability checks"]
+    CHECK --> RESULT["Return an answer with sources or abstain if evidence is insufficient"]
 ```
 
-### Answer flow
+> The chart uses GitHub’s Mermaid rendering and describes AURA DoCS’s current workflow. It is a documentation diagram, not a LangGraph runtime graph.
 
-1. **Upload:** Add a text-based PDF from the library panel.
-2. **Extract:** PyMuPDF extracts text locally while retaining page information.
-3. **Embed and store:** A multilingual E5 embedding model represents document passages locally; SQLite stores the vectors and metadata.
-4. **Retrieve:** A question is embedded locally and matched against stored passages using NumPy.
-5. **Answer:** The question and selected passages are sent to the configured answer service to produce a response with source references when available.
-6. **Optional voice:** Record a question and approve transcription before audio is sent to the configured transcription service.
+### The process
 
-> **Storage choice:** Document vectors are stored in SQLite and searched with NumPy. This project does not use Chroma.
+1. **Add a PDF:** Upload a text-based PDF to your library.
+2. **Extract text:** PyMuPDF extracts text with page information.
+3. **Prepare the index:** The app splits text into passages and creates multilingual embeddings locally.
+4. **Store passages:** SQLite stores passages, metadata, and vectors. NumPy is used for vector comparison.
+5. **Ask a question:** The app searches the local index for relevant passages.
+6. **Generate a response:** The question and selected passages are sent to the configured answer service.
+7. **Return sources or abstain:** The answer includes available source references; the app can abstain if its evidence is insufficient.
+
+For voice questions, the browser records audio. The recording is sent for transcription only after the user selects the transcription action and gives consent.
 
 ## 🌟 Features
 
-- **PDF chat:** Ask questions about indexed, text-based PDFs.
-- **Page-aware references:** Follow source references back to document pages.
-- **Multilingual retrieval:** Uses `intfloat/multilingual-e5-small` for local query and passage embeddings.
-- **Evidence-aware answers:** Answers use retrieved passages; the app can abstain when the retrieved evidence is insufficient.
-- **Follow-up questions:** Conversation context is bounded and available for follow-ups.
-- **Optional voice workflow:** A microphone control, browser recording, and transcription flow with explicit consent.
-- **Light and dark themes:** Peach Sunrise and Midnight Bloom match AURA’s coral-and-blue styling.
-- **Local document indexing:** PDF extraction, embeddings, and the SQLite vector store run locally.
-- **No separate vector database service:** Retrieval uses SQLite and NumPy.
+- **Chat with text-based PDFs** using document-grounded retrieval.
+- **Multilingual embeddings** for questions and passages.
+- **Cross-language retrieval support**; results depend on the PDF, language, and question wording.
+- **Source and page references** to help locate retrieved passages.
+- **Follow-up questions** with bounded conversation history.
+- **Evidence-aware abstention** when the available passages are insufficient.
+- **Optional voice questions** with a separate recording, consent, and transcription flow.
+- **Peach Sunrise and Midnight Bloom themes.**
+- **Local PDF indexing and vector storage** using SQLite and NumPy.
+- **No Chroma or separate vector database service.**
 
 ## 🧰 Tech stack
 
-| Area | Technology | Purpose |
+| Area | Technology | Role |
 |---|---|---|
-| App and UI | Python, Streamlit | Application logic and interactive interface |
-| Composer and theme control | HTML, CSS, JavaScript, Streamlit Components | Inline chat controls and theme switch |
-| PDF extraction | PyMuPDF | Extract PDF text and page information |
+| Application | Python | App and RAG pipeline |
+| Web interface | Streamlit | PDF library, chat, and source display |
+| Composer and theme controls | HTML, CSS, JavaScript, Streamlit Components | Inline input, microphone, and theme switch |
+| PDF extraction | PyMuPDF | Extract text and page information |
 | Embeddings | Sentence Transformers, `intfloat/multilingual-e5-small` | Create multilingual embeddings locally |
-| Vector storage | SQLite | Store document passages, metadata, and embeddings |
-| Similarity search | NumPy | Compare query and document vectors |
-| Answer generation | Groq API, configured Qwen model | Generate responses from retrieved passages |
-| Optional transcription | Browser audio input and configured transcription model | Turn an approved recording into a question |
+| Vector storage | SQLite | Store document passages, vectors, and metadata |
+| Vector search | NumPy | Compare query and document vectors |
+| Answer generation | Groq API and the configured Qwen model | Generate responses from retrieved passages |
+| Optional transcription | Browser audio input and the configured transcription model | Transcribe a question after consent |
+| Configuration | `python-dotenv` | Load local environment settings |
+
+## 🔐 Privacy
+
+- PDF text extraction, embedding, and vector storage happen locally.
+- When you ask a question, the configured answer service receives your question and the selected PDF passages.
+- Voice audio is handled separately and is sent for transcription only after you choose to transcribe and give consent.
+- Do not commit `.env`, private PDFs, or local vector-store data to GitHub.
+
+Only upload documents to external services if you have permission to share the relevant content. Model availability, provider limits, and account access may vary.
+
+## ⚠️ Scope and limitations
+
+- Scanned or image-only PDFs need OCR; OCR is not included.
+- Multilingual retrieval can help with cross-language questions, but it is not guaranteed to work equally well for every PDF and language.
+- A source reference helps locate a passage; it does not by itself prove that the passage semantically supports every part of an answer.
+- The demonstration library PDF, if included, is fictional demo material.
+- Evaluation notes are in [`docs/evaluation.md`](docs/evaluation.md). Synthetic test results should not be treated as proof of performance on real PDFs.
 
 ## 🚀 Run locally
 
-1. Clone the repository and enter its folder:
+1. Clone your repository:
 
    ```powershell
    git clone https://github.com/YOUR-GITHUB-USERNAME/aura-docs.git
@@ -130,20 +153,20 @@ flowchart LR
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. Install the project dependencies:
+3. Install dependencies:
 
    ```powershell
    python -m pip install --upgrade pip
    python -m pip install -r requirements.txt
    ```
 
-4. Create your local environment file:
+4. Create a local environment file:
 
    ```powershell
    Copy-Item .env.example .env
    ```
 
-   Edit `.env` locally. Add your own API key and a model ID currently available to your account. **Never commit `.env` or share its contents.**
+   Edit `.env` locally and add your own API key and an available model ID. Never commit `.env` or paste its contents into chat.
 
 5. Start the app:
 
@@ -151,39 +174,37 @@ flowchart LR
    python -m streamlit run app.py
    ```
 
-The multilingual embedding model may need to download the first time the app is run.
+The local embedding model may need to download the first time it is used.
 
-## 🔐 Privacy notes
-
-- PDF extraction, embedding, and vector storage are performed locally.
-- When you ask a question, the configured answer service receives the question, matching PDF passages, and relevant follow-up context.
-- Voice audio is sent separately for transcription only after you choose the transcription action and give consent.
-- Use PDFs with external services only if you have permission to share the relevant content. API model access and limits depend on your provider account.
-
-## ⚠️ Scope and limitations
-
-- Scanned or image-only PDFs need OCR; OCR is not included.
-- Multilingual retrieval can help with cross-language questions, but results depend on the document and wording.
-- Page references help locate evidence; always check the original passage for important decisions.
-- The sample `demo_guide.pdf`, if included, is fictional demonstration content—not real library policy.
-- Retrieval evaluation and generated-answer quality are different things. See [`docs/evaluation.md`](docs/evaluation.md) for evaluation notes.
-
-## 📁 Project layout
+## 📁 Project structure
 
 ```text
 aura-docs/
 ├── app.py
-├── app_factory.py                 # Pipeline setup is under rag/
-├── rag/                           # PDF QA, retrieval, embeddings, and storage
+├── rag/
+│   ├── app_factory.py
+│   ├── chunking.py
+│   ├── conversation.py
+│   ├── embeddings.py
+│   ├── evaluation.py
+│   ├── llm.py
+│   ├── models.py
+│   ├── pdf_processor.py
+│   ├── pipeline.py
+│   ├── reliability.py
+│   ├── retrieval.py
+│   └── vector_store.py
 ├── ui_components/
 │   └── aura_controls/
-│       └── index.html             # Inline composer and theme control
-├── scripts/                       # Utility and evaluation scripts
+│       └── index.html
+├── scripts/
+│   ├── evaluate_retrieval.py
+│   └── prepare_readme_images.py
 ├── docs/
-│   ├── assets/                    # README dashboard screenshots
+│   ├── assets/
 │   └── evaluation.md
 ├── data/
-│   └── demo/                      # Optional synthetic demo material
+│   └── demo/
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -191,8 +212,6 @@ aura-docs/
 ```
 
 <div align="center">
-
-**AURA DoCS** · Python · Streamlit · SQLite · NumPy  
-*Engineered with care by AJ :)*
-
+  <strong>AURA DoCS</strong> · Python · Streamlit · SQLite · NumPy<br>
+  <em>Engineered with care by AJ :))</em>
 </div>
