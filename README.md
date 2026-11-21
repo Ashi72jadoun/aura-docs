@@ -45,7 +45,7 @@
   </tr>
 </table>
 
-Both previews use equal-size **1200 × 675** image files and are displayed at **480 × 270**.
+
 
 ## ✨ What is AURA DoCS?
 
@@ -213,5 +213,5 @@ aura-docs/
 
 <div align="center">
   <strong>AURA DoCS</strong> · Python · Streamlit · SQLite · NumPy<br>
-  <em>Engineered with care by AJ :))</em>
+  <em>Engineered with care by AJ :)</em>
 </div>
